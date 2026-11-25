@@ -475,6 +475,34 @@ El despliegue manual no se usa en esta entrega, porque no hacemos despliegues re
 
 ---
 
+## Evidencias de ejecución
+
+Capturas tomadas al validar el proyecto en local y en GitHub. Están en `docs/evidencias/`.
+
+**Backend: 11 pruebas unitarias pasan**
+
+![Pruebas del backend con pytest](docs/evidencias/02-backend-pytest.png)
+
+**Backend: despliegue en LocalStack con `lstk sam deploy --config-env dev`**
+
+![Despliegue de alerts-dev](docs/evidencias/03-sam-deploy-dev.png)
+
+**API: creación de alerta con respuesta 201 (Postman)**
+
+![Respuesta 201 en Postman](docs/evidencias/04-postman-201.png)
+
+**Frontend: 11 pruebas pasan con `ng test`**
+
+![Pruebas del frontend](docs/evidencias/05-frontend-tests.png)
+
+**Frontend: pantalla de alertas funcionando contra LocalStack**
+
+![Pantalla de alertas](docs/evidencias/06-frontend-pantalla.png)
+
+**CI en GitHub Actions: backend, frontend y escaneo de secretos en verde**
+
+![Ejecución de GitHub Actions](docs/evidencias/07-github-actions.png)
+
 ## 11. Uso y supervisión de IA
 
 Este proyecto se desarrolló con asistencia de IA (Claude Code), con supervisión humana en cada paso:
