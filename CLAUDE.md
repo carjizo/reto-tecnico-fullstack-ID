@@ -50,3 +50,12 @@ Alcance: este repositorio. Aplican a cualquier asistente de IA que genere, modif
 ## 9. Supervisión humana de la IA
 - Toda salida de la IA se revisa antes de aceptarse.
 - Cada corrección manual importante se documenta en la sección "Uso y supervisión de IA" del README.
+
+## 10. Frontend (Angular 21, `alerts-web/`)
+- Componentes standalone y TypeScript con `strict` activo. Sin `any` salvo en el manejo de errores HTTP, donde se justifica.
+- Toda llamada HTTP sale de un servicio (`AlertService`). Los componentes no usan `HttpClient` directamente.
+- La API key del usuario se guarda solo en `sessionStorage`. Nunca en código, en `environment*.ts` ni en el repositorio.
+- Las configuraciones por ambiente (`dev`, `qa`, `prod`) cambian únicamente la URL base de la API, nunca credenciales.
+- Los errores se traducen a mensajes para el usuario en un solo lugar (`toUserMessage`). Nunca se muestra un error técnico crudo.
+- Todo servicio y pantalla nueva llega con pruebas unitarias en el mismo commit (`ng test --watch=false`).
+- Antes de cerrar un cambio: `npm test -- --watch=false` y `npm run build` sin errores.
