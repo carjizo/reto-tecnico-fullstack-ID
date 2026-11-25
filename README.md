@@ -194,6 +194,25 @@ $env:AWS_DEFAULT_REGION = 'us-east-1'
 
 ---
 
+### Configuración y secretos
+
+La configuración del servicio se lee de variables de entorno. Los valores sensibles (la API key) se guardan en Secrets Manager, no en el código ni en la configuración de la Lambda.
+
+| Variable | Qué contiene | Quién la define |
+|---|---|---|
+| `TABLE_NAME` | Nombre de la tabla DynamoDB (`alerts-dev`, `alerts-qa`, ...) | La plantilla SAM |
+| `ALERTS_API_KEY_SECRET_ID` | Nombre del secreto con la API key (`alerts/dev/api-key`) | La plantilla SAM |
+| `ALERTS_API_KEY` | API key para pruebas locales sin AWS. Si existe, tiene prioridad sobre Secrets Manager | Tú, solo en local. La plantilla no la define |
+| `AWS_DEFAULT_REGION` | Región (`us-east-1`) | Tú, en cada terminal |
+| `LOCALSTACK_AUTH_TOKEN` | Token de LocalStack | Tú, como variable de usuario de Windows |
+
+Cómo se guardan los valores:
+- **Token de LocalStack:** en la variable de usuario de Windows (sección 3.1). Nunca en un archivo del proyecto.
+- **API key:** solo en Secrets Manager, creado por la plantilla con un valor aleatorio. No aparece en el repositorio.
+- **Variables de la Lambda:** solo guardan nombres (tabla y secreto), nunca el valor de la clave.
+
+> **Nota sobre el enunciado:** el reto pide leer la configuración sensible desde variables de entorno simulando Secrets Manager. En este proyecto, la API key se lee de Secrets Manager en tiempo de ejecución; las variables de entorno solo guardan el nombre del secreto. Para pruebas locales sin AWS, la clave puede pasarse con `ALERTS_API_KEY`.
+
 ## 4. Backend: pruebas, despliegue y API
 
 Todos los comandos de esta sección se ejecutan desde la carpeta `alerts-service`:
