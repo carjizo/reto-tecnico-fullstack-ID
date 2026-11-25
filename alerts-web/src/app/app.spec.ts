@@ -87,6 +87,20 @@ describe('App', () => {
     expect(text()).toContain('No se pudo conectar con la API');
   });
 
+  it('muestra mensaje de conexión cuando el servicio responde 504 (gateway timeout)', () => {
+    const app = fixture.componentInstance;
+    app.orderId = 'ORD-1001';
+    app.apiKey = 'clave-prueba';
+    app.search();
+
+    http
+      .expectOne((r) => r.url === '/api/v1/orders/ORD-1001/alerts')
+      .flush({}, { status: 504, statusText: 'Gateway Timeout' });
+    fixture.detectChanges();
+
+    expect(text()).toContain('No se pudo conectar con la API');
+  });
+
   it('muestra el mensaje de validación de la API al registrar una alerta inválida', () => {
     const app = fixture.componentInstance;
     app.orderId = 'ORD-1001';

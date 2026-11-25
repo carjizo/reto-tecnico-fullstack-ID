@@ -437,7 +437,6 @@ El despliegue manual no se usa en esta entrega, porque no hacemos despliegues re
 - **Proxy de desarrollo:** la URL de `proxy.conf.json` depende del ID de la API de `alerts-dev`. Si recreas el stack, cambia y hay que actualizarla.
 - **Frontend sin despliegue:** el CI genera el build y lo guarda como artefacto. El despliegue a S3 y CloudFront queda como siguiente paso.
 - **Validación del 404:** el reto no define un servicio de órdenes para verificar que `orderId` existe. Por eso solo se valida el formato, y el 404 se reserva para rutas inexistentes.
-- **Errores de red:** los códigos 502, 503 y 504 aún muestran el mensaje genérico en lugar del de conexión.
 
 ---
 

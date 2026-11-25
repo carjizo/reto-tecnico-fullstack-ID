@@ -104,7 +104,8 @@ export class App {
 /** Convierte un error HTTP en un mensaje claro para el usuario. */
 function toUserMessage(err: unknown): string {
   if (err instanceof HttpErrorResponse) {
-    if (err.status === 0) {
+    // 0: sin respuesta. 502, 503 y 504: el proxy o la API no pudo alcanzar el servicio.
+    if ([0, 502, 503, 504].includes(err.status)) {
       return 'No se pudo conectar con la API. Revisa tu conexión.';
     }
     if (err.status === 401) {
