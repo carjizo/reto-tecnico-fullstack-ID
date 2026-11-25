@@ -465,7 +465,6 @@ Este proyecto se desarrolló con asistencia de IA (Claude Code), con supervisió
 - **Error de la IA corregido a mano (`samlocal`):** la guía inicial usaba `samlocal`, que está obsoleto. Lo cambié por `lstk sam` después de validarlo con un despliegue de prueba.
 - **Decisión tomada tras revisar el CI:** la acción oficial de gitleaks falló en el primer push, porque el primer commit no tiene padre. Probé una alternativa con Docker, la descarté por no integrarse con GitHub y no fijar la imagen por digest, y volví a la acción oficial. El fallo solo afecta al primer push.
 - **Refactor del modelo:** la primera versión mezclaba el modelo de negocio con el formato de DynamoDB en `models.py`. Lo separé en `entities.py` para que el dominio no dependa de la tabla.
-- **Limitación que la IA no pudo resolver:** la plantilla SAM configura CORS, pero LocalStack no genera el método `OPTIONS`. Lo documenté y usé el proxy de `ng serve` para desarrollo, en lugar de forzar una solución que solo funcionara en local.
 
 ---
 
