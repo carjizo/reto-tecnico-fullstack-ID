@@ -1,0 +1,6 @@
+# Dependencias solo para desarrollo y CI (la Lambda ya trae boto3 en el runtime)
+pytest==8.3.5
+boto3==1.35.90
+ruff==0.8.4
+bandit==1.8.0
+cfn-lint==1.22.3

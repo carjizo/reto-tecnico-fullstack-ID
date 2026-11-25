@@ -1,0 +1,27 @@
+version = 0.1
+
+# Despliegues en LocalStack con: lstk sam deploy --config-env <ambiente>
+
+[dev.deploy.parameters]
+stack_name = "alerts-dev"
+region = "us-east-1"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+parameter_overrides = "StageName=\"dev\""
+
+[qa.deploy.parameters]
+stack_name = "alerts-qa"
+region = "us-east-1"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+parameter_overrides = "StageName=\"qa\""
+
+[prod.deploy.parameters]
+stack_name = "alerts-prod"
+region = "us-east-1"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+parameter_overrides = "StageName=\"prod\""

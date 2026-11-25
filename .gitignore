@@ -25,8 +25,16 @@ LOCALSTACK_AUTH_TOKEN*
 .DS_Store
 Thumbs.db
 
-# Reportes de pruebas y cobertura
+# Cachés de herramientas de calidad (lint, tipos, pruebas)
+.ruff_cache/
+.mypy_cache/
 .pytest_cache/
+.bandit*
+
+# Logs
+*.log
+
+# Reportes de pruebas y cobertura
 .coverage
 htmlcov/
 coverage/

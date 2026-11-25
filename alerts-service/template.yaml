@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: API de alertas operativas por orden (reto técnico FullStack)
+
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, qa, prod]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Handler: handler.lambda_handler
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  ######################################################
+  # API Gateway (REST)
+  ######################################################
+  AlertsApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+
+  ######################################################
+  # Lambda: registra y consulta alertas
+  # Permisos mínimos: solo la tabla y el secreto de este servicio
+  ######################################################
+  AlertsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/alerts/
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref AlertsTable
+          ALERTS_API_KEY_SECRET_ID: !Ref ApiKeySecret
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AlertsTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref ApiKeySecret
+      Events:
+        CreateAlert:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AlertsApi
+            Path: /api/v1/orders/{orderId}/alerts
+            Method: post
+        ListAlerts:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AlertsApi
+            Path: /api/v1/orders/{orderId}/alerts
+            Method: get
+
+  ######################################################
+  # DynamoDB: una partición por orden, una fila por alerta
+  ######################################################
+  AlertsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub alerts-${StageName}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+        - AttributeName: alertId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+        - AttributeName: alertId
+          KeyType: RANGE
+      SSESpecification:
+        SSEEnabled: true
+
+  ######################################################
+  # Secrets Manager: API key que valida el header X-Api-Key
+  # El valor lo genera CloudFormation; no se guarda en el repositorio
+  ######################################################
+  ApiKeySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub alerts/${StageName}/api-key
+      Description: API key del servicio de alertas (header X-Api-Key)
+      GenerateSecretString:
+        PasswordLength: 48
+        ExcludePunctuation: true
+
+Outputs:
+  AlertsBaseUrl:
+    Description: URL base de la API de alertas
+    Value: !Sub https://${AlertsApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/api/v1/orders
