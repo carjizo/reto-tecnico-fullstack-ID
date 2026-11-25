@@ -1,0 +1,95 @@
+<main class="container">
+  <h1>Alertas operativas</h1>
+
+  <section class="card">
+    <h2>Consultar alertas de una orden</h2>
+    <div class="grid">
+      <label>
+        orderId
+        <input name="orderId" [(ngModel)]="orderId" placeholder="ORD-1001" />
+      </label>
+      <label>
+        API key
+        <input
+          name="apiKey"
+          type="password"
+          [(ngModel)]="apiKey"
+          (ngModelChange)="onApiKeyChange()"
+          placeholder="X-Api-Key"
+        />
+      </label>
+      <label>
+        Severidad
+        <select name="severityFilter" [(ngModel)]="severityFilter" (ngModelChange)="searched() && search()">
+          <option value="">Todas</option>
+          @for (severity of severities; track severity) {
+            <option [value]="severity">{{ severity }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <button type="button" (click)="search()" [disabled]="loading()">Buscar</button>
+
+    @if (error(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+
+    @if (loading()) {
+      <p class="info">Cargando…</p>
+    } @else if (searched()) {
+      @if (alerts().length === 0) {
+        <p class="info">Esta orden no tiene alertas para el filtro seleccionado.</p>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Severidad</th>
+              <th>Mensaje</th>
+              <th>Origen</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (alert of alerts(); track alert.alertId) {
+              <tr>
+                <td>{{ alert.severity }}</td>
+                <td>{{ alert.message }}</td>
+                <td>{{ alert.source }}</td>
+                <td>{{ alert.createdAt }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </section>
+
+  <section class="card">
+    <h2>Registrar una alerta</h2>
+    <div class="grid">
+      <label>
+        Severidad
+        <select name="newSeverity" [(ngModel)]="newAlert.severity">
+          @for (severity of severities; track severity) {
+            <option [value]="severity">{{ severity }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Mensaje
+        <input name="newMessage" [(ngModel)]="newAlert.message" maxlength="500" />
+      </label>
+      <label>
+        Origen
+        <input name="newSource" [(ngModel)]="newAlert.source" maxlength="100" />
+      </label>
+    </div>
+    <button type="button" (click)="create()" [disabled]="saving()">
+      {{ saving() ? 'Registrando…' : 'Registrar' }}
+    </button>
+
+    @if (success(); as message) {
+      <p class="success">{{ message }}</p>
+    }
+  </section>
+</main>

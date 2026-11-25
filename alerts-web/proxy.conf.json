@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://ylblzrt42n.execute-api.localhost.localstack.cloud:4566/dev",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  }
+}

@@ -43,6 +43,40 @@ jobs:
       - name: Validar plantilla SAM con cfn-lint
         run: cfn-lint template.yaml
 
+  frontend:
+    name: Pruebas y build del frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: alerts-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: alerts-web/package-lock.json
+
+      - name: Instalar dependencias
+        # --legacy-peer-deps: npm 10 falla al resolver las peer dependencies de vitest
+        run: npm ci --legacy-peer-deps
+
+      - name: Pruebas unitarias (ng test)
+        run: npm test -- --watch=false
+
+      - name: Build de producción
+        run: npm run build
+
+      - name: Guardar build como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: alerts-web-build
+          path: alerts-web/dist/alerts-web/browser
+          retention-days: 7
+
   secrets-scan:
     name: Buscar secretos en el repositorio
     runs-on: ubuntu-latest
@@ -62,7 +96,7 @@ jobs:
   deploy-dev:
     name: Desplegar a dev (manual)
     if: github.event_name == 'workflow_dispatch'
-    needs: [test, secrets-scan]
+    needs: [test, frontend, secrets-scan]
     runs-on: ubuntu-latest
     environment: dev
     permissions:
