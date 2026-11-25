@@ -1,0 +1,97 @@
+name: CI Backend - alerts-service
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint, seguridad y pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: alerts-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: alerts-service/requirements-dev.txt
+
+      - name: Instalar dependencias
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Lint con ruff
+        run: python -m ruff check functions tests
+
+      - name: Análisis de seguridad con bandit
+        run: python -m bandit -r functions -q
+
+      - name: Pruebas unitarias
+        run: python -m pytest -v
+
+      - name: Validar plantilla SAM con cfn-lint
+        run: cfn-lint template.yaml
+
+  secrets-scan:
+    name: Buscar secretos en el repositorio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (historial completo)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ejecutar gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Despliegue manual. No se ejecuta en cada push y requiere configurar
+  # un rol de AWS (OIDC) en el ambiente "dev" de GitHub.
+  deploy-dev:
+    name: Desplegar a dev (manual)
+    if: github.event_name == 'workflow_dispatch'
+    needs: [test, secrets-scan]
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: alerts-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configurar credenciales AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Configurar SAM CLI
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Build y deploy a dev
+        run: |
+          sam build
+          sam deploy --config-env dev
