@@ -1,4 +1,4 @@
-name: CI Backend - alerts-service
+name: CI - alerts-service y alerts-web
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   test:
-    name: Lint, seguridad y pruebas
+    name: Backend - lint, seguridad y pruebas
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,7 +44,7 @@ jobs:
         run: cfn-lint template.yaml
 
   frontend:
-    name: Pruebas y build del frontend
+    name: Frontend - pruebas y build
     runs-on: ubuntu-latest
     defaults:
       run:
