@@ -1,0 +1,32 @@
+# Entornos virtuales y dependencias
+.venv/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# Compilaciones y artefactos de SAM / Angular
+.aws-sam/
+alerts-web/dist/
+alerts-web/.angular/
+samconfig.local.toml
+
+# Secretos y variables locales (nunca al repositorio)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+LOCALSTACK_AUTH_TOKEN*
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Reportes de pruebas y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
