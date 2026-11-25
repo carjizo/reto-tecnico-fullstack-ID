@@ -1,3 +1,4 @@
+import { LowerCasePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ const API_KEY_STORAGE_KEY = 'alerts.apiKey';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule],
+  imports: [FormsModule, LowerCasePipe],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

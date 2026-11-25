@@ -52,7 +52,9 @@
           <tbody>
             @for (alert of alerts(); track alert.alertId) {
               <tr>
-                <td>{{ alert.severity }}</td>
+                <td>
+                  <span class="badge sev-{{ alert.severity | lowercase }}">{{ alert.severity }}</span>
+                </td>
                 <td>{{ alert.message }}</td>
                 <td>{{ alert.source }}</td>
                 <td>{{ alert.createdAt }}</td>
