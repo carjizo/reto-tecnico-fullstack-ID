@@ -49,6 +49,10 @@ def handle_request(event: dict[str, Any], service: AlertService, expected_api_ke
 
 
 def _route(event: dict[str, Any], service: AlertService, expected_api_key: str) -> dict[str, Any]:
+    # Preflight de CORS: el navegador lo envía antes de la petición real, sin API key.
+    if event.get("httpMethod") == "OPTIONS":
+        return _response(204, None)
+
     if not _is_authorized(event, expected_api_key):
         return _response(401, {"error": "API key inválida o ausente"})
 
@@ -89,9 +93,18 @@ def _is_authorized(event: dict[str, Any], expected_api_key: str) -> bool:
     return hmac.compare_digest(received.encode(), expected_api_key.encode())
 
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, X-Api-Key",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+}
+
+
 def _response(status_code: int, body: Any) -> dict[str, Any]:
+    # Un 204 no lleva cuerpo; el resto va en JSON.
+    body_text = "" if status_code == 204 else json.dumps(body, ensure_ascii=False)
     return {
         "statusCode": status_code,
-        "headers": {"Content-Type": "application/json"},
-        "body": json.dumps(body, ensure_ascii=False),
+        "headers": {"Content-Type": "application/json", **CORS_HEADERS},
+        "body": body_text,
     }

@@ -125,3 +125,30 @@ def test_api_key_incorrecta_devuelve_401():
     response = handle_request(make_event("GET", api_key="otra-clave"), service, API_KEY)
 
     assert response["statusCode"] == 401
+
+
+def test_preflight_options_responde_204_sin_api_key():
+    service = AlertService(InMemoryAlertRepository())
+
+    response = handle_request(make_event("OPTIONS", api_key=None), service, API_KEY)
+
+    assert response["statusCode"] == 204
+    assert response["body"] == ""
+    assert response["headers"]["Access-Control-Allow-Origin"] == "*"
+    assert "X-Api-Key" in response["headers"]["Access-Control-Allow-Headers"]
+
+
+def test_respuestas_incluyen_cabeceras_cors():
+    service = AlertService(InMemoryAlertRepository())
+
+    response = handle_request(make_event("POST", valid_body()), service, API_KEY)
+
+    assert response["headers"]["Access-Control-Allow-Methods"] == "GET, POST, OPTIONS"
+
+
+def test_severity_en_minusculas_devuelve_400():
+    service = AlertService(InMemoryAlertRepository())
+
+    response = handle_request(make_event("POST", valid_body("high")), service, API_KEY)
+
+    assert response["statusCode"] == 400

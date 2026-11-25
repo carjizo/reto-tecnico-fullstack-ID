@@ -23,6 +23,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
+      # SAM crea el preflight OPTIONS (MOCK, sin Lambda ni API key)
+      Cors:
+        AllowOrigin: "'*'"
+        AllowHeaders: "'Content-Type,X-Api-Key'"
+        AllowMethods: "'GET,POST,OPTIONS'"
 
   ######################################################
   # Lambda: registra y consulta alertas
